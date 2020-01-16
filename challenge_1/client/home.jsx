@@ -1,29 +1,38 @@
 import React, { useState, useEffect } from 'react';
-import ReactPaginate from 'react-paginate';
 import axios from 'axios';
+import Paginate from './paginate.jsx'
 
 function Home() {
-    // const [search, setSearch] = useState('');
+    const [search, setSearch] = useState('');
     const [data, setData] = useState([]);
     useEffect(() => {
         axios.get(`/events?_page=1&_limit=10`)
             .then((response) => {
                 setData(response.data);
-                console.log(response.data);
-                console.log(data)
             })
             .catch((err) => {
                 console.log(err)
             })
     }, [])
 
-    // function handleChange(e) {
-    //     setSearch(e.target.value)
-    // }
+    function handleChange(e) {
+        setSearch(e.target.value);
+    }
 
-    function handleClick(e) {
-        console.log(e.selected + 1);
-        axios.get(`/events?_page=${e.selected + 1}&_limit=10`)
+    function handleSearchClick(e) {
+        e.preventDefault();
+        axios.get(`/events?/_page=1&_limit=10&q=${search}`)
+        .then((response) => {
+            setData(response.data);
+            setSearch('');
+        })
+        .catch((err) => {
+            console.log(err)
+        })
+    }
+
+    function handlePageClick(e) {
+        axios.get(`/events?_page=${e.selected + 1}&_limit=10&q=${search}`)
             .then((response) => {
                 setData(response.data);
             })
@@ -33,18 +42,14 @@ function Home() {
     }
 
     function renderData(array) {
-        console.log('array', array)
         return (
             <div>
-                <ul style={{ listStyle: 'none' }}>
+                <ul style={{ listStyle: 'none' }} onChange={handleChange}>
                     {array.map((list) => {
                         return (
-                            
-                                <li>{list.description}</li>
-                            
+                            <li>{list.description}</li>
                         )
                     })}
-
                 </ul>
             </div>
 
@@ -54,24 +59,14 @@ function Home() {
     return (
         <div>
             <h2>Library of Historical Events</h2>
-            {/* <input type="text"
+            <input type="text"
                 placeholder="Begin your search..."
                 name="search"
                 value={search}
-                onChange={handleChange}></input> */}
+                onChange={handleChange}></input> 
+            <button onClick={handleSearchClick}>Search</button>
             {renderData(data)}
-            <ReactPaginate
-                previousLabel={'previous'}
-                nextLabel={'next'}
-                breakLabel={'...'}
-                breakClassName={'break-me'}
-                pageCount={100}
-                marginPagesDisplayed={1}
-                pageRangeDisplayed={5}
-                onPageChange={handleClick}
-                containerClassName={'pagination'}
-                subContainerClassName={'pages pagination'}
-                activeClassName={'active'} />
+            <Paginate handleClick={handlePageClick} />
         </div>
     )
 }
