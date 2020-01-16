@@ -5,10 +5,12 @@ import Paginate from './paginate.jsx'
 function Home() {
     const [search, setSearch] = useState('');
     const [data, setData] = useState([]);
+    const [pageCount, setPageCount] = useState(37859);
     useEffect(() => {
         axios.get(`/events?_page=1&_limit=10`)
             .then((response) => {
                 setData(response.data);
+                console.log([response['headers']['x-total-count']])
             })
             .catch((err) => {
                 console.log(err)
@@ -25,6 +27,7 @@ function Home() {
         .then((response) => {
             setData(response.data);
             setSearch('');
+            setPageCount([response['headers']['x-total-count']]);
         })
         .catch((err) => {
             console.log(err)
@@ -35,6 +38,7 @@ function Home() {
         axios.get(`/events?_page=${e.selected + 1}&_limit=10&q=${search}`)
             .then((response) => {
                 setData(response.data);
+                setPageCount([response['headers']['x-total-count']]);
             })
             .catch((err) => {
                 console.log(err)
@@ -66,7 +70,7 @@ function Home() {
                 onChange={handleChange}></input> 
             <button onClick={handleSearchClick}>Search</button>
             {renderData(data)}
-            <Paginate handleClick={handlePageClick} />
+            <Paginate handleClick={handlePageClick} pageCount={pageCount} />
         </div>
     )
 }

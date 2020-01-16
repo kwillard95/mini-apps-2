@@ -10,7 +10,7 @@ function Paginate (props) {
                     nextLabel={'next'}
                     breakLabel={'...'}
                     breakClassName={'break-me'}
-                    pageCount={100}
+                    pageCount={props.pageCount/10}
                     marginPagesDisplayed={1}
                     pageRangeDisplayed={5}
                     onPageChange={props.handleClick}
